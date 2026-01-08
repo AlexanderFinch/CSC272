@@ -1,5 +1,8 @@
 package com.chess;
 
+import com.chess.Exceptions.NoChessBoardFoundException;
+import com.chess.pieces.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,19 +13,18 @@ public class ChessBoard {
     private static String CHESS_FILE = "chess_game.txt";
     // A constant for the board size, making the code easier to read and modify
     private static final int BOARD_SIZE = 8;
-    // A 2D array of Strings to store the chess pieces (e.g., "P", "R", " ", etc.)
-    private String[][] board;
-    private HashMap<String, Piece> pieces = new HashMap<>();
-    private LinkedList<String> pieceList = new LinkedList<>();
-    private ArrayList<String> list = new ArrayList<>();
+    private Piece[][] board;
+
 
     public ChessBoard() {
+        initializeBoard();
     }
 
     public static void main(String[] args) {
         // 1. Method Call: Initialize the board
 
         ChessBoard chessBoard = new ChessBoard();
+
 
         // 2. Method Call: Display the initial board state
         System.out.println("--- Initial Board State ---");
@@ -42,108 +44,104 @@ public class ChessBoard {
      * @return A 2D String array representing the starting chess board.
      */
     public void initializeBoard() {
-        String[][] initialBoard = new String[BOARD_SIZE][BOARD_SIZE];
+        Piece[][] initialBoard = new Piece[BOARD_SIZE][BOARD_SIZE];
 
         // Use nested loops to iterate through all squares of the 2D array
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 // Place pawns
-                if (row == 1) {
-                    initialBoard[row][col] = "P"; // Black Pawns
-                } else if (row == 6) {
-                    initialBoard[row][col] = "p"; // White Pawns (lowercase for white)
-                }
-                // Place other back-row pieces
-                else if (row == 0 || row == 7) {
-                    String pieceType = "";
-                    if (col == 0 || col == 7) pieceType = "R"; // Rook
-                    else if (col == 1 || col == 6) pieceType = "N"; // Knight
-                    else if (col == 2 || col == 5) pieceType = "B"; // Bishop
-                    else if (col == 3) pieceType = "Q"; // Queen
-                    else if (col == 4) pieceType = "K"; // King
+                if (row == 1) initialBoard[row][col] = new Pawn(Piece.COLOR.BLACK); // Black Pawns
+                else if (row == 6)
+                    initialBoard[row][col] = new Pawn(Piece.COLOR.WHITE); // White Pawns (lowercase for white)
 
-                    // Assign the pieces based on the row color
-                    if (row == 7) {
-                        initialBoard[row][col] = pieceType.toLowerCase(); // White
-                    } else {
-                        initialBoard[row][col] = pieceType; // Black
-                    }
+                    // Place other back-row pieces for black
+                else if (row == 0) {
+                    if (col == 0 || col == 7) initialBoard[row][col] = new Rook(Piece.COLOR.BLACK); // Rook
+                    else if (col == 1 || col == 6) initialBoard[row][col] = new Knight(Piece.COLOR.BLACK); // Knight
+                    else if (col == 2 || col == 5) initialBoard[row][col] = new Bishop(Piece.COLOR.BLACK); // Bishop
+                    else if (col == 3) initialBoard[row][col] = new Queen(Piece.COLOR.BLACK); // Queen
+                    else if (col == 4) initialBoard[row][col] = new King(Piece.COLOR.BLACK); // King
                 }
-                // Fill empty squares with a space
-                if (initialBoard[row][col] == null) {
-                    initialBoard[row][col] = " ";
+                // Place other back-row pieces for white
+                else if (row == 7) {
+                    if (col == 0 || col == 7) initialBoard[row][col] = new Rook(Piece.COLOR.WHITE); // Rook
+                    else if (col == 1 || col == 6) initialBoard[row][col] = new Knight(Piece.COLOR.WHITE); // Knight
+                    else if (col == 2 || col == 5) initialBoard[row][col] = new Bishop(Piece.COLOR.WHITE); // Bishop
+                    else if (col == 3) initialBoard[row][col] = new Queen(Piece.COLOR.WHITE); // Queen
+                    else if (col == 4) initialBoard[row][col] = new King(Piece.COLOR.WHITE); // King
                 }
             }
         }
-        setBoard(initialBoard);
+        this.board = initialBoard;
     }
 
-    void loadBoard() throws NoChessBoardFoundException {
-        String[][] initialBoard = new String[BOARD_SIZE][BOARD_SIZE];
-
-        try(Scanner saveFile = new Scanner(new File(CHESS_FILE));) {
-            saveFile.useDelimiter("[,\\n]");
-            while(saveFile.hasNext()) {
-                for(int row = 0; row < BOARD_SIZE; row++){
-                    for(int col = 0; col < BOARD_SIZE; col++){
-                        initialBoard[row][col] = saveFile.next();
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new NoChessBoardFoundException("Unable to load the chess board!");
-        }
-
-        setBoard(initialBoard);
-    }
+//    void loadBoard() throws NoChessBoardFoundException {
+//        Piece[][] initialBoard = new String[BOARD_SIZE][BOARD_SIZE];
+//
+//        try(Scanner saveFile = new Scanner(new File(CHESS_FILE));) {
+//            saveFile.useDelimiter("[,\\n]");
+//            while(saveFile.hasNext()) {
+//                for(int row = 0; row < BOARD_SIZE; row++){
+//                    for(int col = 0; col < BOARD_SIZE; col++){
+//                        initialBoard[row][col] = saveFile.next();
+//                    }
+//                }
+//            }
+//        } catch (FileNotFoundException e) {
+//            throw new NoChessBoardFoundException("Unable to load the chess board!");
+//        }
+//
+//        setBoard(initialBoard);
+//    }
 
     public void saveBoard() {
 
-        try(PrintWriter writer = new PrintWriter(CHESS_FILE);) {
-            //writer = new PrintWriter(CHESS_FILE);
-            for(int row = 0; row < BOARD_SIZE; row++ ){
-                for(int col = 0; col < BOARD_SIZE; col++){
-                    if(col > 0 && col < BOARD_SIZE){
-                        writer.print(",");
-                    }
-                    writer.print(board[row][col]);
-                }
-                writer.print("\n");
-            }
+        try (PrintWriter writer = new PrintWriter(CHESS_FILE);) {
+            writer.print(this);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public Piece getPiece(int row, int col){
+        return board[row][col];
     }
 
     /**
      * Method to display the current state of the chessboard in the console.
      * This method takes a 2D array as a parameter and uses nested loops for iteration.
      */
-    protected void displayBoard() throws NoChessBoardFoundException {
-        if(board == null){
+    public String toString() throws NoChessBoardFoundException {
+        if (board == null) {
             throw new NoChessBoardFoundException("Board was not loaded properly.");
         }
+        StringBuffer boardBuff = new StringBuffer();
         // Print column headers (A-H)
-        System.out.print("  ");
+        boardBuff.append("  ");
         for (char colChar = 'A'; colChar < 'A' + BOARD_SIZE; colChar++) {
-            System.out.print(" " + colChar + " ");
+            boardBuff.append(" " + colChar + " ");
         }
-        System.out.println();
+        boardBuff.append("\n");
 
         for (int row = 0; row < BOARD_SIZE; row++) {
             // Print a separator line above each row
-            System.out.println(" +--+--+--+--+--+--+--+--+");
+            boardBuff.append(" +--+--+--+--+--+--+--+--+\n");
             // Print row numbers (8 down to 1)
-            System.out.print((8 - row) + "|");
+            boardBuff.append((8 - row) + "|");
 
             for (int col = 0; col < BOARD_SIZE; col++) {
                 // Access array elements using two indices: [row][column]
-                System.out.print(" " + board[row][col] + "|");
+                if (board[row] == null || board[row][col] == null) {
+                    boardBuff.append("  |");
+                } else {
+                    boardBuff.append(" " + board[row][col].toString() + "|");
+                }
             }
-            System.out.println(); // Move to the next line after the row is printed
+            boardBuff.append("\n"); // Move to the next line after the row is printed
         }
         // Print the final bottom line
-        System.out.println(" +--+--+--+--+--+--+--+--+");
+        boardBuff.append(" +--+--+--+--+--+--+--+--+");
+        return boardBuff.toString();
     }
 
     /**
@@ -173,16 +171,5 @@ public class ChessBoard {
         } else {
 
         }*/
-    }
-
-    public void setBoard(String[][] board) {
-        // if the array length is greater than 8 return an error
-        this.board = board;
-    }
-
-    public class NoChessBoardFoundException extends Throwable {
-        public NoChessBoardFoundException(String s) {
-            super(s);
-        }
     }
 }

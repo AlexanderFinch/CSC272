@@ -1,9 +1,13 @@
 package com.chess;
 
+import com.chess.Exceptions.NoChessBoardFoundException;
+import com.chess.Exceptions.QuitGameException;
+import com.chess.ui.GamePlayMenu;
+import com.chess.ui.Menu;
+import com.chess.ui.StartMenu;
+
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ChessGame {
 
@@ -18,15 +22,17 @@ public class ChessGame {
     private ChessBoard board;
 
     public static void main(String[] args) {
-        run();
+        ChessGame game = new ChessGame();
+        game.run();
     }
 
-    static public void run() {
+    public void run() {
         try {
+            //setup UI
             getMenuInput(game.startMenu);
             getMenuInput(game.gamePlayMenu);
             //play();
-        } catch (FileNotFoundException | ChessBoard.NoChessBoardFoundException | QuitGameException e) {
+        } catch (FileNotFoundException | NoChessBoardFoundException | QuitGameException e) {
             System.out.println(e.getMessage());
         }
         System.out.println("---***--- Thanks for playing! ---***---");
@@ -38,7 +44,7 @@ public class ChessGame {
         board = new ChessBoard();
     }
 
-    static public void getMenuInput(Menu inMenu) throws FileNotFoundException, ChessBoard.NoChessBoardFoundException, QuitGameException {
+    static public void getMenuInput(Menu inMenu) throws FileNotFoundException, NoChessBoardFoundException {
         Scanner in = new Scanner(System.in);
 
         Menu menu = inMenu;
@@ -50,144 +56,15 @@ public class ChessGame {
         }
     }
 
-    public static void play() throws FileNotFoundException, ChessBoard.NoChessBoardFoundException, QuitGameException {
+    public static void play() throws FileNotFoundException, NoChessBoardFoundException {
 
-        game.board.displayBoard();
+        //game.board.displayBoard();
         game.gamePlayMenu.printMenu();
         Scanner in = new Scanner(System.in);
         String input = in.next();
         while (game.gamePlayMenu.processInput(input).equalsIgnoreCase("InvalidInput")) {
-            game.board.displayBoard();
+            //game.board.displayBoard();
             game.gamePlayMenu.printMenu();
         }
-    }
-
-    private interface IMenu {
-        boolean validate(String option);
-
-        String processInput(String input) throws ChessBoard.NoChessBoardFoundException, QuitGameException;
-
-        void printMenu();
-    }
-
-    private abstract class Menu implements IMenu {
-        String menu = null;
-
-        @Override
-        public void printMenu() {
-            System.out.print(menu);
-        }
-
-        void newMethod(){}
-    }
-
-    private class StartMenu extends Menu {
-
-        public StartMenu() {
-            this.menu = "Chess Game Start menu:\n" +
-                    "  * New game (N)\n" +
-                    "  * Load a game (L)\n" +
-                    "  * Quit (Q)\n" +
-                    ">  ";
-
-        }
-
-        @Override
-        public void newMethod(){
-            System.out.println("THis is a new method");
-        }
-
-
-        @Override
-        public boolean validate(String option) {
-            return option.equalsIgnoreCase("N")
-                    || option.equalsIgnoreCase("L")
-                    || option.equalsIgnoreCase("Q");
-        }
-
-        @Override
-        public String processInput(String input) throws ChessBoard.NoChessBoardFoundException, QuitGameException {
-            if (!this.validate(input)) {
-                System.out.println("Invalid input provided!");
-                return "InvalidInput";
-            }
-
-            this.newMethod();
-
-            String returnString = "";
-            if (input.equalsIgnoreCase("N")) {
-                game.board.initializeBoard();
-                returnString = "New";
-            } else if (input.equalsIgnoreCase("L")) {
-                game.board.loadBoard();
-                returnString = "Load";
-            } else if (input.equalsIgnoreCase("Q")) {
-                throw new QuitGameException();
-            }
-
-            return returnString;
-        }
-    }
-
-    private class GamePlayMenu extends Menu {
-
-        public GamePlayMenu() {
-            this.menu = "Your move!\n" +
-                    "  * To play, enter the column+row of the piece you want to move and the column+row of the space you want to move it to, (ex. \"A2 B4\")\n" +
-                    "  * Save game (S), Load game (L), New game (N), Quit (Q)\n" +
-                    ">  ";
-        }
-
-        @Override
-        public boolean validate(String option) {
-            String regex = "[A-H]{1}[1-8]{1}[ ]{1}[A-H]{1}[1-8]{1}";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(option);
-
-            return option.equalsIgnoreCase("N")
-                    || option.equalsIgnoreCase("L")
-                    || option.equalsIgnoreCase("S")
-                    || option.equalsIgnoreCase("Q")
-                    || matcher.find();
-        }
-
-        @Override
-        public String processInput(String input) throws ChessBoard.NoChessBoardFoundException, QuitGameException {
-            if (!this.validate(input)) {
-                System.out.println("Invalid input provided");
-                return "InvalidInput";
-            }
-
-            String returnString = "";
-            if (input.equalsIgnoreCase("S")) {
-                game.board.saveBoard();
-                returnString = "Save";
-            } else if (input.equalsIgnoreCase("N")) {
-                game.board.initializeBoard();
-                returnString = "New";
-            } else if (input.equalsIgnoreCase("L")) {
-                game.board.loadBoard();
-                returnString = "Load";
-            } else if (input.equalsIgnoreCase("Q")) {
-                throw new QuitGameException();
-            }
-            return returnString;
-        }
-    }
-
-    private class ExitMenu extends Menu{
-
-        @Override
-        public boolean validate(String option) {
-            return false;
-        }
-
-        @Override
-        public String processInput(String input) throws ChessBoard.NoChessBoardFoundException, QuitGameException {
-            return null;
-        }
-    }
-
-    private class QuitGameException extends Throwable {
     }
 }
