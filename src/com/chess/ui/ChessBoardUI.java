@@ -14,6 +14,9 @@ import javax.swing.SwingUtilities;
 
 public class ChessBoardUI {
 
+    private JPanel[][] boardTiles = new JPanel[ChessBoard.BOARD_SIZE][ChessBoard.BOARD_SIZE];
+    private ChessBoard board;
+
     private JMenuBar createMenuBar(){
         // 1. Create the Menu Bar
         JMenuBar menuBar = new JMenuBar();
@@ -57,7 +60,8 @@ public class ChessBoardUI {
         return menuBar;
     }
 
-    public void createAndShowGUI(ChessBoard board) {
+    public void createAndShowGUI( ) {
+
         JFrame frame = new JFrame("Chessboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
@@ -71,10 +75,7 @@ public class ChessBoardUI {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 JPanel square = new JPanel();
-                if(board.getPiece(row, col)!= null) {
-                    JLabel label = new JLabel(board.getPiece(row, col).toString());
-                    square.add(label);
-                }
+                square.add(new JPanel());
                 // Alternate colors: if the sum of row and column is even, use white/light color, else black/dark
                 if ((row + col) % 2 == 0) {
                     square.setBackground(Color.WHITE);
@@ -82,21 +83,20 @@ public class ChessBoardUI {
                     square.setBackground(Color.BLACK);
                 }
                 contentPane.add(square);
+                boardTiles[row][col] = square;
             }
         }
 
         frame.setVisible(true);
     }
 
-    public void startUI(ChessBoard board){
-        SwingUtilities.invokeLater(() -> createAndShowGUI(board));
+    public void loadBoard(ChessBoard board){
+
     }
 
-    public static void main(String[] args) {
-        // Ensure the GUI creation runs on the Event Dispatch Thread (EDT)
-        ChessBoardUI ui = new ChessBoardUI();
-        ChessBoard board = new ChessBoard();
-        ui.startUI(board);
+    public void startUI(ChessBoard board){
+        this.board = board;
+        SwingUtilities.invokeLater(this::createAndShowGUI);
     }
 }
 

@@ -12,8 +12,9 @@ public class ChessBoard {
 
     private static String CHESS_FILE = "chess_game.txt";
     // A constant for the board size, making the code easier to read and modify
-    private static final int BOARD_SIZE = 8;
-    private Piece[][] board;
+    public static final int BOARD_SIZE = 8;
+
+    private Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
 
 
     public ChessBoard() {
@@ -44,35 +45,33 @@ public class ChessBoard {
      * @return A 2D String array representing the starting chess board.
      */
     public void initializeBoard() {
-        Piece[][] initialBoard = new Piece[BOARD_SIZE][BOARD_SIZE];
 
         // Use nested loops to iterate through all squares of the 2D array
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 // Place pawns
-                if (row == 1) initialBoard[row][col] = new Pawn(Piece.COLOR.BLACK); // Black Pawns
+                if (row == 1) board[row][col] = new Pawn(Piece.COLOR.BLACK); // Black Pawns
                 else if (row == 6)
-                    initialBoard[row][col] = new Pawn(Piece.COLOR.WHITE); // White Pawns (lowercase for white)
+                    board[row][col] = new Pawn(Piece.COLOR.WHITE); // White Pawns (lowercase for white)
 
                     // Place other back-row pieces for black
                 else if (row == 0) {
-                    if (col == 0 || col == 7) initialBoard[row][col] = new Rook(Piece.COLOR.BLACK); // Rook
-                    else if (col == 1 || col == 6) initialBoard[row][col] = new Knight(Piece.COLOR.BLACK); // Knight
-                    else if (col == 2 || col == 5) initialBoard[row][col] = new Bishop(Piece.COLOR.BLACK); // Bishop
-                    else if (col == 3) initialBoard[row][col] = new Queen(Piece.COLOR.BLACK); // Queen
-                    else if (col == 4) initialBoard[row][col] = new King(Piece.COLOR.BLACK); // King
+                    if (col == 0 || col == 7) board[row][col] = new Rook(Piece.COLOR.BLACK); // Rook
+                    else if (col == 1 || col == 6) board[row][col] = new Knight(Piece.COLOR.BLACK); // Knight
+                    else if (col == 2 || col == 5) board[row][col] = new Bishop(Piece.COLOR.BLACK); // Bishop
+                    else if (col == 3) board[row][col] = new Queen(Piece.COLOR.BLACK); // Queen
+                    else if (col == 4) board[row][col] = new King(Piece.COLOR.BLACK); // King
                 }
                 // Place other back-row pieces for white
                 else if (row == 7) {
-                    if (col == 0 || col == 7) initialBoard[row][col] = new Rook(Piece.COLOR.WHITE); // Rook
-                    else if (col == 1 || col == 6) initialBoard[row][col] = new Knight(Piece.COLOR.WHITE); // Knight
-                    else if (col == 2 || col == 5) initialBoard[row][col] = new Bishop(Piece.COLOR.WHITE); // Bishop
-                    else if (col == 3) initialBoard[row][col] = new Queen(Piece.COLOR.WHITE); // Queen
-                    else if (col == 4) initialBoard[row][col] = new King(Piece.COLOR.WHITE); // King
+                    if (col == 0 || col == 7) board[row][col] = new Rook(Piece.COLOR.WHITE); // Rook
+                    else if (col == 1 || col == 6) board[row][col] = new Knight(Piece.COLOR.WHITE); // Knight
+                    else if (col == 2 || col == 5) board[row][col] = new Bishop(Piece.COLOR.WHITE); // Bishop
+                    else if (col == 3) board[row][col] = new Queen(Piece.COLOR.WHITE); // Queen
+                    else if (col == 4) board[row][col] = new King(Piece.COLOR.WHITE); // King
                 }
             }
         }
-        this.board = initialBoard;
     }
 
 //    void loadBoard() throws NoChessBoardFoundException {
@@ -171,5 +170,9 @@ public class ChessBoard {
         } else {
 
         }*/
+    }
+
+    public Piece[][] getBoard() {
+        return board;
     }
 }
