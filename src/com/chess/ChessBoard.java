@@ -26,6 +26,9 @@ public class ChessBoard {
 
         ChessBoard chessBoard = new ChessBoard();
 
+        Object p = new Knight(Piece.COLOR.BLACK);
+        ((Knight) p).move();
+        p.getClass().getName();
 
         // 2. Method Call: Display the initial board state
         System.out.println("--- Initial Board State ---");
@@ -102,8 +105,23 @@ public class ChessBoard {
         }
     }
 
+    /**
+     * Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException: Cannot invoke "com.chess.Piece.toString()" because the return value of "com.chess.ChessBoard.getPiece(int, int)" is null
+     * 	at com.chess.ui.ChessBoardUI.loadBoard(ChessBoardUI.java:103)
+     * 	at com.chess.ui.ChessBoardUI.createAndShowGUI(ChessBoardUI.java:96)
+     * 	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:323)
+     * 	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:723)
+     * 	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:702)
+     * 	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+     * 	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+     * 	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+     * 	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+     * 	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+     * 	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+     */
+
     public Piece getPiece(int row, int col){
-        return board[row][col];
+        return board[row][col] != null ? board[row][col] : null;
     }
 
     /**
@@ -174,5 +192,9 @@ public class ChessBoard {
 
     public Piece[][] getBoard() {
         return board;
+    }
+
+    public static int calculateIndex(int row, int col){
+        return (row + 1) * (col + 1) -1;
     }
 }
